@@ -9,8 +9,14 @@ import SwiftUI
 
 struct ContentView: View {
     @State var showExchangeInfo = false
+    @State var showSelectCurrency = false
+    
     @State var leftAmount = ""
     @State var rightAmount = ""
+    
+    @State var leftCurrency: Currency = .silverPiece
+    @State var rightCurrency: Currency = .goldPiece
+    
     var body: some View {
         ZStack {
             // bg image
@@ -34,18 +40,22 @@ struct ContentView: View {
                         // currency
                         HStack {
                             // currency img
-                            Image(.silverpiece)
+                            Image(leftCurrency.image)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 33)
                             // currency text
-                            Text("Silver piece")
+                            Text(leftCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
+                        }
+                        .onTapGesture {
+                            showSelectCurrency.toggle()
                         }
                         // text
                         TextField("Amount", text: $leftAmount)
                             .textFieldStyle(.roundedBorder)
+                            .cornerRadius(15)
                     }
                     // equal
                     Image(systemName: "equal")
@@ -57,24 +67,27 @@ struct ContentView: View {
                         // currency
                         HStack {
                             // currency text
-                            Text("Gold piece")
+                            Text(rightCurrency.name)
                                 .font(.headline)
                                 .foregroundStyle(.white)
                             // currency img
-                            Image(.goldpiece)
+                            Image(rightCurrency.image)
                                 .resizable()
                                 .scaledToFit()
                                 .frame(height: 33)
                         }
+                        .onTapGesture {
+                            showSelectCurrency.toggle()
+                        }
                         // text
                         TextField("Amount", text: $rightAmount)
                             .textFieldStyle(.roundedBorder)
+                            .cornerRadius(15)
                             .multilineTextAlignment(.trailing)
                     }
                 }
                 .padding()
                 .background(.black.opacity(0.5))
-                .clipShape(.capsule)
                 Spacer()
                 // info btn
                 HStack {
@@ -87,12 +100,14 @@ struct ContentView: View {
                             .foregroundStyle(.white)
                     }
                     .padding(.trailing)
-                    .sheet(isPresented: $showExchangeInfo, content: {
-                        ExchangeInfo()
-                    })
                 }
             }
-            //            .border(.blue)
+        }
+        .sheet(isPresented: $showExchangeInfo) {
+            ExchangeInfo()
+        }
+        .sheet(isPresented: $showSelectCurrency) {
+            SelectCurrency(startCurrency: $leftCurrency, convertCurrency: $rightCurrency)
         }
     }
 }
